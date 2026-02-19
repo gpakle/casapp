@@ -31,8 +31,42 @@ Streamlit application to calculate promotion eligibility, pay fixation, and sala
 - `views/`: Streamlit UI modules for different sections.
 - `app.py`: Main entry point.
 
-## Features (Current Status)
+## Key Features:
+- **Career Continuum**: Simulate an entire career from First Service Date to Standardize Entry Pay.
+- **Cumulative CAS Simulation**: For faculty with no past promotions, the system retroactively simulates all eligible promotions.
+- **Arrears Calculation**: Accurate monthly arrears computation with 7th Pay Matrix rules (July Increment, HRA/DA Slabs).
+- **Pay Fixation**: Standard 7th CPC Fixation Logic.
+- **Profile Management**: Save/Load profiles with full history (stored as JSON in SQLite).
 
-- **Database**: Models defined for Pay Matrix, DA Rates, TA Slabs. Seeding logic implemented.
-- **Arrears Engine**: Implemented Monthly Arrears Calculation with Maharashtra-specific rules (HRA slabs, Fixed TA).
-- **UI**: Skeleton with Navigation, Profile Entry form, and Arrears Report view.
+## Continuing Development on a New Machine
+
+Yes! You can continue developing this app from any machine with Git and Python installed.
+
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/gpakle/casapp.git
+    cd casapp
+    ```
+
+2.  **Set Up Environment**:
+    ```bash
+    # Create virtual environment
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    
+    # Install dependencies
+    pip install -r requirements.txt
+    ```
+
+3.  **Initialize Database**:
+    ```bash
+    # Create and seed the database
+    python3 src/database.py
+    ```
+
+4.  **Run the App**:
+    ```bash
+    streamlit run app.py
+    ```
+
+**Note for AI Assistants**: When opening this project on a new machine with an AI tool (like Cursor, Windsurf, or Antigravity), simply point the tool to the `casapp` folder. The presence of `src/` and `app.py` gives the AI full context to understand the architecture and continue development.
