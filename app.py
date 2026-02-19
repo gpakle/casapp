@@ -118,6 +118,34 @@ tab1, tab2, tab3 = st.tabs(["👤 Profile Entry", "✅ Eligibility & Fixation", 
 with tab1:
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     profile.render_profile_form()
+    
+    # Continuum Logic Integration
+    if st.session_state['faculty_data'].get('name') and st.session_state['faculty_data'].get('initial_doj'):
+        from src.logic_continuum import calculate_pay_at_current_joining
+        from src.database import SessionLocal
+        
+        fd = st.session_state['faculty_data']
+        db = SessionLocal()
+        
+        # Run Simulation
+        continuum_res = calculate_pay_at_current_joining(
+            initial_doj=fd['initial_doj'],
+            current_doj=fd['date_of_joining'],
+            entry_qual=fd['entry_qualification'],
+            db=db
+        )
+        db.close()
+        
+        if "Error" not in continuum_res:
+            st.info(f"ℹ️ **Continuum Simulation**: Based on your initial joining date of **{fd['initial_doj']}**, "
+                    f"your calculated entry pay at this institute on **{fd['date_of_joining']}** should be "
+                    f"**Level {continuum_res['Joining_Level']}** at **Basic Pay ₹{continuum_res['Joining_Basic']:,}**.")
+            
+            # Store Calculation for Tab 2 usage
+            st.session_state['continuum_data'] = continuum_res
+            # Update Total Past Years (Continuum Logic overrides manual input effectively)
+            st.session_state['faculty_data']['past_service_years'] = continuum_res['Total_Past_Years']
+            
     st.markdown('</div>', unsafe_allow_html=True)
 
 with tab2:
@@ -125,8 +153,20 @@ with tab2:
     st.header("Checking Eligibility & Pay Fixation")
     
     if 'faculty_data' in st.session_state and st.session_state['faculty_data'].get('name'):
-        data = st.session_state['faculty_data']
-        st.info(f"Evaluating Profile for: **{data['name']}** | Current Level: **{data['current_level']}**")
+        data = st.session_state['faculty_data'].copy()
+        
+        # OVERRIDE with Continuum Data if available
+        # User requested: "pass this... as the new baseline"
+        if 'continuum_data' in st.session_state:
+            c_data = st.session_state['continuum_data']
+            data['current_level'] = c_data['Joining_Level']
+            data['current_basic'] = c_data['Joining_Basic']
+            # Note: We are checking eligibility FROM the joining date now?
+            # logic_eligibility uses data['current_level'] to find NEXT level.
+            # If we pass Joining Level, we are checking "What is the Next Level after Joining?".
+            st.caption(f"Using Calculated Baseline: Level {data['current_level']} | Basic {data['current_basic']}")
+            
+        st.info(f"Evaluating Profile for: **{data['name']}**")
         
         # Determine target level
         levels = ["10", "11", "12", "13A1", "14"]
@@ -185,9 +225,37 @@ with tab2:
             db.close()
             
         else:
-            st.error(f"❌ Not Eligible for Promotion: {res['reason']}")
+            st.error(f"❌ Pending Requirement: {res['reason']}")
             if res['due_date']:
                 st.write(f"Projected Future Due Date: {res['due_date']}")
+    
+    # CUMULATIVE SIMULATION BLOCK (If applicable)
+    if 'faculty_data' in st.session_state:
+        fd = st.session_state['faculty_data']
+        # If user explicitly said "No Past Promotions" (checkbox unchecked)
+        # And we have initial DOJ
+        if not fd.get('has_past_promotions', False) and fd.get('initial_doj'):
+            st.divider()
+            st.subheader("🔁 Cumulative CAS Simulation (Backlog)")
+            st.info("Since you indicated no past promotions, we simulated your career path to identify pending backlog promotions.")
+            
+            from src.logic_cumulative import evaluate_cumulative_promotions
+            from src.database import SessionLocal
+            
+            db = SessionLocal()
+            try:
+                events, final_lvl, final_basic = evaluate_cumulative_promotions(fd, db)
+                
+                if events:
+                    st.write("### Identified Promotion Backlog")
+                    st.table(events)
+                    st.success(f"Based on simulation, your **Current Status** should be **Level {final_lvl}** with Basic **₹{final_basic:,}**.")
+                else:
+                    st.warning("Simulation ran but found no eligible promotions in the backlog period.")
+            except Exception as e:
+                st.error(f"Simulation Error: {e}")
+            finally:
+                db.close()
     else:
         st.warning("Please complete and save the Profile in the 'Profile Entry' tab first.")
     
@@ -197,7 +265,22 @@ with tab3:
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     # Wrapper for reports to look integrated
     if 'faculty_data' in st.session_state and st.session_state['faculty_data'].get('name'):
-        reports.show()
+        # TEMPORARY CONTEXT OVERRIDE for Arrears Engine
+        # User requested to pass Continuum Baseline to Logic Arrears
+        original_data = st.session_state['faculty_data'].copy()
+        
+        if 'continuum_data' in st.session_state:
+            c_data = st.session_state['continuum_data']
+            # We inject the Joining Status as the "Current Status" for the calculator's baseline
+            st.session_state['faculty_data']['current_level'] = c_data['Joining_Level']
+            st.session_state['faculty_data']['current_basic'] = c_data['Joining_Basic']
+            st.caption(f"ℹ️ Arrears Calculator using Continuum Baseline: Level {c_data['Joining_Level']} | Basic {c_data['Joining_Basic']}")
+            
+        try:
+            reports.show()
+        finally:
+            # RESTORE original manual inputs so Profile Tab stays consistent
+            st.session_state['faculty_data'] = original_data
     else:
         st.warning("Please complete the Profile Entry first.")
     st.markdown('</div>', unsafe_allow_html=True)

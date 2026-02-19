@@ -44,3 +44,26 @@ git push -u origin main --force
 
 - **Data Persistence**: The app uses SQLite (`cas_app.db`). On Streamlit Cloud, this database is **ephemeral** (deleted on restart).
 - **Security**: Do not commit secrets (API keys, etc.) to GitHub. This app currently requires no secrets.
+
+## Step 3: Updating the App
+
+Streamlit Cloud has **Continuous Deployment**. This means the app updates automatically whenever you push code to the `main` branch.
+
+**Workflow for Making Changes:**
+
+1.  **Make Edits Locally**: Change code in `app.py`, `src/`, etc.
+2.  **Test Locally**: Run `streamlit run app.py` to verify.
+3.  **Commit & Push**:
+
+```bash
+# Add changed files
+git add .
+
+# Commit with a message describing the change
+git commit -m "Fixed typo in header"
+
+# Push to GitHub
+git push origin main
+```
+
+4.  **Auto-Deploy**: Go to your Streamlit Cloud dashboard. You will see the app updating (often within seconds).

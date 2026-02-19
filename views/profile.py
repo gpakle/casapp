@@ -182,9 +182,19 @@ def render_profile_form():
         cc_idx = cc_opts.index(defaults.get('city_class')) if defaults.get('city_class') in cc_opts else 2
         city_class = st.selectbox("City Class (For HRA/TA)", cc_opts, index=cc_idx) 
         
-        st.subheader("2. Past Service & Joining")
-        past_service_years = st.number_input("Approved Past Service (Years)", min_value=0, value=defaults.get('past_service_years', 0))
-        date_of_joining = st.date_input("Date of Joining Current Institute", min_value=datetime.date(1990, 1, 1), value=defaults.get('date_of_joining', datetime.date(2010, 1, 1)))
+        st.subheader("2. Service Timeline & Past Experience")
+        initial_doj = st.date_input("Initial Date of Joining (First Approved Service)", 
+                                  help="The date you started your very first countable job.",
+                                  value=defaults.get('initial_doj', datetime.date(2005, 1, 1)),
+                                  min_value=datetime.date(1990, 1, 1),
+                                  max_value=datetime.date(2026, 12, 31))
+                                  
+        past_service_approved = st.checkbox("Is the past service officially approved by the University?", 
+                                          value=defaults.get('past_service_approved', True))
+                                          
+        # Calculate years mathematically
+        past_service_years = 0 # Placeholder, calculated in logic
+        date_of_joining = st.date_input("Date of Joining Current Institute", min_value=datetime.date(1990, 1, 1), max_value=datetime.date(2026, 12, 31), value=defaults.get('date_of_joining', datetime.date(2010, 1, 1)))
         
         st.subheader("3. Qualification Chronology")
         q_opts = ["B.E./B.Tech", "M.E./M.Tech", "Ph.D."]
@@ -195,8 +205,21 @@ def render_profile_form():
         acquired_phd_date = st.date_input("Date of acquiring Ph.D. (if acquired in-service)", value=defaults.get('acquired_phd_date'), min_value=datetime.date(1995, 1, 1), max_value=datetime.date(2028, 12, 31))
         
         st.subheader("4. Promotion History (CAS)")
-        promoted_level_11_date = st.date_input("Date Promoted to Sr. Scale (Level 11)", value=defaults.get('promoted_level_11_date'), min_value=datetime.date(1995, 1, 1), max_value=datetime.date(2028, 12, 31))
-        promoted_level_12_date = st.date_input("Date Promoted to Sel. Grade (Level 12)", value=defaults.get('promoted_level_12_date'), min_value=datetime.date(1995, 1, 1), max_value=datetime.date(2028, 12, 31))
+        has_past_promotions = st.checkbox("I have received past CAS promotions", value=defaults.get('has_past_promotions', False))
+        
+        if has_past_promotions:
+            promoted_level_11_date = st.date_input("Date Promoted to Sr. Scale (Level 11)", 
+                                                 value=defaults.get('promoted_level_11_date'), 
+                                                 min_value=datetime.date(1995, 1, 1), 
+                                                 max_value=datetime.date(2028, 12, 31))
+            promoted_level_12_date = st.date_input("Date Promoted to Sel. Grade (Level 12)", 
+                                                 value=defaults.get('promoted_level_12_date'), 
+                                                 min_value=datetime.date(1995, 1, 1), 
+                                                 max_value=datetime.date(2028, 12, 31))
+        else:
+            st.info("ℹ️ **Cumulative Mode Active**: The system will simulate your entire career from joining to evaluate all pending promotions sequentially.")
+            promoted_level_11_date = None
+            promoted_level_12_date = None
         
         st.subheader("5. Current Pay Status")
         l_opts = ["10", "11", "12", "13A1", "14"]
@@ -238,11 +261,14 @@ def render_profile_form():
                 "name": name,
                 "institute_type": institute_type,
                 "city_class": city_class,
-                "past_service_years": past_service_years,
+                "initial_doj": initial_doj,
+                "past_service_approved": past_service_approved,
+                "past_service_years": 0, # Legacy field kept for compatibility if needed elsewhere
                 "date_of_joining": date_of_joining,
                 "entry_qualification": entry_qualification,
                 "acquired_mtech_date": acquired_mtech_date,
                 "acquired_phd_date": acquired_phd_date,
+                "has_past_promotions": has_past_promotions, # Store Toggle State
                 "promoted_level_11_date": promoted_level_11_date,
                 "promoted_level_12_date": promoted_level_12_date,
                 "current_level": current_level,
