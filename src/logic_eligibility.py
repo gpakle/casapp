@@ -62,6 +62,11 @@ def evaluate_cas_eligibility(faculty_data: dict, target_level: str):
         
     base_due_date = last_promo + relativedelta(years=req_years)
     
+    # JULY ALIGNMENT RULE (User Request)
+    # Effect from July 1st of the eligibility year
+    # Example: Eligible Sept 2016 -> Due July 1, 2016
+    base_due_date = date(base_due_date.year, 7, 1)
+    
     flags = []
     
     # 3. Pre-2010 Ph.D. Waiver

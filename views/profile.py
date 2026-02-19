@@ -183,18 +183,33 @@ def render_profile_form():
         city_class = st.selectbox("City Class (For HRA/TA)", cc_opts, index=cc_idx) 
         
         st.subheader("2. Service Timeline & Past Experience")
-        initial_doj = st.date_input("Initial Date of Joining (First Approved Service)", 
-                                  help="The date you started your very first countable job.",
-                                  value=defaults.get('initial_doj', datetime.date(2005, 1, 1)),
-                                  min_value=datetime.date(1990, 1, 1),
-                                  max_value=datetime.date(2026, 12, 31))
-                                  
-        past_service_approved = st.checkbox("Is the past service officially approved by the University?", 
-                                          value=defaults.get('past_service_approved', True))
+        
+        has_prior_service = st.checkbox("I have prior service at other institutes (before current joining)", 
+                                      value=defaults.get('has_prior_service', False))
+        
+        # Current Institute Joining
+        date_of_joining = st.date_input("Date of Joining Current Institute", 
+                                      min_value=datetime.date(1990, 1, 1), 
+                                      max_value=datetime.date(2026, 12, 31), 
+                                      value=defaults.get('date_of_joining', datetime.date(2010, 1, 1)))
+
+        if has_prior_service:
+            initial_doj = st.date_input("Initial Date of Joining (First Approved Service)", 
+                                      help="The date you started your very first countable job.",
+                                      value=defaults.get('initial_doj', datetime.date(2005, 1, 1)),
+                                      min_value=datetime.date(1990, 1, 1),
+                                      max_value=datetime.date(2026, 12, 31))
+                                      
+            past_service_approved = st.checkbox("Is the past service officially approved by the University?", 
+                                              value=defaults.get('past_service_approved', True))
+        else:
+            # If no prior service, Initial DOJ = Current DOJ
+            initial_doj = date_of_joining
+            past_service_approved = False
+            st.info("ℹ️ Considering your Current Joining Date as the start of your career.")
                                           
         # Calculate years mathematically
         past_service_years = 0 # Placeholder, calculated in logic
-        date_of_joining = st.date_input("Date of Joining Current Institute", min_value=datetime.date(1990, 1, 1), max_value=datetime.date(2026, 12, 31), value=defaults.get('date_of_joining', datetime.date(2010, 1, 1)))
         
         st.subheader("3. Qualification Chronology")
         q_opts = ["B.E./B.Tech", "M.E./M.Tech", "Ph.D."]
@@ -261,6 +276,7 @@ def render_profile_form():
                 "name": name,
                 "institute_type": institute_type,
                 "city_class": city_class,
+                "has_prior_service": has_prior_service, # Store Toggle
                 "initial_doj": initial_doj,
                 "past_service_approved": past_service_approved,
                 "past_service_years": 0, # Legacy field kept for compatibility if needed elsewhere
