@@ -1,0 +1,7 @@
+designation,pay_band_name,min_band,max_band,agp,entry_pay_total
+Lecturer,PB-3,15600,39100,6000,21600
+Lecturer (Sr Scale),PB-3,15600,39100,7000,25790
+Lecturer (Sel Grade),PB-3,15600,39100,8000,29900
+Associate Professor,PB-4,37400,67000,9000,49200
+Professor,PB-4,37400,67000,10000,53000
+Principal,PB-4,37400,67000,10000,53000

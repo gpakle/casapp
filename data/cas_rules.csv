@@ -1,0 +1,5 @@
+rule_id,from_level,to_level,service_years,phd_required,pre_2010_waiver,api_exempt_start,api_exempt_end
+1,10,11,5,FALSE,FALSE,2015-10-17,2019-09-10
+2,11,12,5,FALSE,FALSE,2015-10-17,2019-09-10
+3,12,13A1,3,TRUE,TRUE,2015-10-17,2019-09-10
+4,13A1,14,3,TRUE,FALSE,2015-10-17,2019-09-10

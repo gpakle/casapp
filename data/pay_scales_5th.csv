@@ -1,0 +1,7 @@
+designation,min_basic,increment_1,stage_1_end,increment_2,stage_2_end,increment_3,max_basic
+Lecturer,8000,275,13500,0,0,0,13500
+Lecturer (Sr Scale),10000,325,15200,0,0,0,15200
+Lecturer (Sel Grade),12000,420,18300,0,0,0,18300
+Assistant Professor,12000,420,18300,0,0,0,18300
+Professor,16400,450,20900,500,22400,0,22400
+Principal,18400,500,22400,0,0,0,22400

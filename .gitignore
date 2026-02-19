@@ -1,0 +1,31 @@
+# Bytes
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.venv/
+.env
+
+# Distribution / Build
+build/
+dist/
+*.egg-info/
+
+# Database
+*.db
+*.sqlite3
+cas_app.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+pay_comm,designation,scale,min_basic,agp
+5,Lecturer,8000-275-13500,8000,
+5,Lecturer (Sr. Scale),10000-325-15200,10000,
+5,Lecturer (Sel. Grade),12000-420-18300,12000,
+5,Assistant Professor,12000-420-18300,12000,
+5,Professor,16400-450-20900-500-22400,16400,
+5,Principal,18400-500-22400,18400,
+6,Assistant Professor,15600-39100,15600,6000
+6,Assistant Professor (Sr Scale),15600-39100,15600,7000
+6,Assistant Professor (Sel Grade),15600-39100,15600,8000
+6,Associate Professor,37400-67000,37400,9000
+6,Professor,37400-67000,37400,10000
+6,Principal,37400-67000,37400,10000
